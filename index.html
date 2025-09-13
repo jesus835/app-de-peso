@@ -1435,7 +1435,8 @@
             <div class="modal-bmi-description" id="pediatric-modal-bmi-description">-</div>
             <div class="modal-bmi-range" id="pediatric-modal-bmi-percentile">-</div>
             <div class="modal-actions">
-                <button class="modal-btn modal-btn-primary" onclick="closePediatricBMIModal()">Cerrar</button>
+                <button class="modal-btn modal-btn-primary" onclick="closePediatricBMIModalAndShowMeter()">Ver Medidor</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closePediatricBMIModal()">Cerrar</button>
             </div>
         </div>
     </div>
@@ -1925,7 +1926,7 @@
                 description = 'El niño tiene obesidad. Consulta urgentemente con un pediatra.';
             }
 
-            // Mostrar resultado en la sección de resultados del overlay
+            // Mostrar resultado en la sección de resultados de la pantalla pediátrica
             const resultValue = document.getElementById('pediatric-bmi-value');
             const resultCategory = document.getElementById('pediatric-bmi-category');
             const resultDescription = document.getElementById('pediatric-bmi-description');
@@ -1935,6 +1936,12 @@
             if (resultCategory) resultCategory.textContent = category;
             if (resultDescription) resultDescription.textContent = description;
             if (resultRange) resultRange.textContent = `Percentil: ${percentile.toFixed(1)}%`;
+
+            // Actualizar también el medidor y estadísticas (igual que adultos)
+            document.getElementById('meter-value').textContent = roundedBMI;
+            document.getElementById('current-bmi').textContent = roundedBMI;
+            document.getElementById('meter-category').textContent = category;
+            document.getElementById('meter-description').textContent = description;
 
             // Mostrar resultado en modal
             const modalValue = document.getElementById('pediatric-modal-bmi-value');
@@ -1948,6 +1955,14 @@
             if (modalPercentile) modalPercentile.textContent = `Percentil: ${percentile.toFixed(1)}%`;
             
             console.log('Elementos del modal:', {modalValue, modalCategory, modalDescription, modalPercentile});
+
+            // Calcular diferencia de peso para estadísticas
+            const targetWeight = 22.5 * heightM * heightM; // Peso objetivo basado en IMC 22.5
+            const weightDifference = Math.round((weightKg - targetWeight) * 10) / 10;
+            document.getElementById('weight-diff').textContent = weightDifference > 0 ? `+${weightDifference}` : weightDifference;
+
+            // Actualizar medidor visual (aguja)
+            updateMeter(bmi);
 
             // Abrir modal
             console.log('Abriendo modal pediátrico...');
@@ -1965,6 +1980,12 @@
                 if (resultCategory) resultCategory.textContent = category;
                 if (resultDescription) resultDescription.textContent = description;
                 if (resultRange) resultRange.textContent = `Percentil: ${percentile.toFixed(1)}%`;
+
+                // Actualizar medidor y estadísticas también en el timeout
+                document.getElementById('meter-value').textContent = roundedBMI;
+                document.getElementById('current-bmi').textContent = roundedBMI;
+                document.getElementById('meter-category').textContent = category;
+                document.getElementById('meter-description').textContent = description;
 
                 const modalValue = document.getElementById('pediatric-modal-bmi-value');
                 const modalCategory = document.getElementById('pediatric-modal-bmi-category');
