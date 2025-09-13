@@ -373,6 +373,10 @@
             z-index: 1000;
         }
 
+        #pediatric-bmi-modal {
+            z-index: 1001 !important;
+        }
+
         .modal-overlay.show {
             display: flex;
         }
@@ -534,53 +538,6 @@
             background: #E5E7EB;
         }
 
-        /* Overlay Pediátrico de Pantalla Completa */
-        .pediatric-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #1a1a1a;
-            z-index: 1000;
-            display: none;
-            flex-direction: column;
-            align-items: flex-start;
-            justify-content: flex-start;
-            padding-top: 20px;
-        }
-
-
-        /* Modal Pediátrico debe estar por encima del overlay */
-        #pediatric-bmi-modal {
-            z-index: 1001 !important;
-        }
-
-        .pediatric-overlay.show {
-            display: flex;
-        }
-
-
-        .pediatric-container {
-            width: 375px;
-            height: 812px;
-            background: #1a1a1a;
-            border-radius: 32px;
-            overflow: hidden;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            margin: 0 auto;
-        }
-
-        .pediatric-overlay .bmi-content {
-            flex: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            padding-bottom: 80px;
-        }
 
 
 
@@ -1257,7 +1214,7 @@
                 <div class="nav-item" onclick="showScreen('stats-screen')">
                     <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
                 </div>
-                <div class="nav-item" onclick="openPediatricModal()">
+                <div class="nav-item" onclick="showScreen('pediatric-screen')">
                     <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
                 </div>
             </div>
@@ -1291,7 +1248,91 @@
                 <div class="nav-item" onclick="showScreen('stats-screen')">
                     <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
                 </div>
-                <div class="nav-item" onclick="openPediatricModal()">
+                <div class="nav-item" onclick="showScreen('pediatric-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla Pediátrica -->
+        <div class="screen gender-male" id="pediatric-screen">
+            <div class="bmi-content">
+                <div class="header">
+                    <h1 class="app-title">Control de Peso Pediátrico</h1>
+                    <button class="menu-btn" onclick="showScreen('calculator-screen')">←</button>
+                </div>
+
+                <div class="gender-selection">
+                    <label class="input-label">Género</label>
+                    <div class="pediatric-gender-buttons">
+                        <button class="pediatric-gender-btn active" data-gender="male">
+                            <div class="pediatric-gender-icon">♂</div>
+                            <div class="pediatric-gender-label">Niño</div>
+                        </button>
+                        <button class="pediatric-gender-btn" data-gender="female">
+                            <div class="pediatric-gender-icon">♀</div>
+                            <div class="pediatric-gender-label">Niña</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Edad</label>
+                    <div class="input-container">
+                        <input type="number" class="input-field" id="pediatric-age" value="8" min="2" max="17">
+                        <div class="input-arrows">
+                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', 1)">▲</button>
+                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', -1)">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Altura (cm)</label>
+                    <div class="input-container">
+                        <input type="number" class="input-field" id="pediatric-height" value="120" min="50" max="200">
+                        <div class="input-arrows">
+                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-height', 1)">▲</button>
+                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-height', -1)">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Peso (lbs)</label>
+                    <div class="input-container">
+                        <input type="number" class="input-field" id="pediatric-weight" value="55" min="10" max="220">
+                        <div class="input-arrows">
+                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-weight', 1)">▲</button>
+                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-weight', -1)">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculatePediatricBMI()">Calcular</button>
+
+                <div class="result-section" id="pediatric-result-section">
+                    <div style="background: #FF6B6B; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
+                        📊 RESULTADO DEL BMI PEDIÁTRICO
+                    </div>
+                    <div class="bmi-value" id="pediatric-bmi-value">0</div>
+                    <div class="bmi-category" id="pediatric-bmi-category">-</div>
+                    <div class="bmi-description" id="pediatric-bmi-description">-</div>
+                    <div class="bmi-range" id="pediatric-bmi-range">-</div>
+                </div>
+            </div>
+
+            <div class="bottom-nav gender-male pediatric-gender-male">
+                <div class="nav-item" onclick="showScreen('calculator-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/hombre.png" alt="Calculadora" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="showScreen('meter-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/productividad.png" alt="Medidor" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="showScreen('stats-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item active" onclick="showScreen('pediatric-screen')">
                     <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
                 </div>
             </div>
@@ -1363,7 +1404,7 @@
                 <div class="nav-item active" onclick="showScreen('stats-screen')">
                     <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
                 </div>
-                <div class="nav-item" onclick="openPediatricModal()">
+                <div class="nav-item" onclick="showScreen('pediatric-screen')">
                     <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
                 </div>
             </div>
@@ -1399,86 +1440,12 @@
         </div>
     </div>
 
-    <!-- Overlay para Control Pediátrico -->
-    <div class="pediatric-overlay" id="pediatric-overlay">
-        <div class="pediatric-container">
-            <div class="bmi-content">
-            <div class="header">
-                <h1 class="app-title">Control de Peso</h1>
-                <button class="menu-btn" onclick="closePediatricModal()">←</button>
-            </div>
-
-            <div class="gender-selection">
-                <label class="input-label">Género</label>
-                <div class="pediatric-gender-buttons">
-                    <button class="pediatric-gender-btn active" data-gender="male">
-                        <div class="pediatric-gender-icon">♂</div>
-                        <div class="pediatric-gender-label">Niño</div>
-                    </button>
-                    <button class="pediatric-gender-btn" data-gender="female">
-                        <div class="pediatric-gender-icon">♀</div>
-                        <div class="pediatric-gender-label">Niña</div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="input-section">
-                <label class="input-label">Edad</label>
-                <div class="input-container">
-                    <input type="number" class="input-field" id="pediatric-age" value="8" min="2" max="17">
-                    <div class="input-arrows">
-                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', 1)">▲</button>
-                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', -1)">▼</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-section">
-                <label class="input-label">Altura (cm)</label>
-                <div class="input-container">
-                    <input type="number" class="input-field" id="pediatric-height" value="120" min="50" max="200">
-                    <div class="input-arrows">
-                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-height', 1)">▲</button>
-                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-height', -1)">▼</button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="input-section">
-                <label class="input-label">Peso (lbs)</label>
-                <div class="input-container">
-                    <input type="number" class="input-field" id="pediatric-weight" value="55" min="10" max="220">
-                    <div class="input-arrows">
-                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-weight', 1)">▲</button>
-                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-weight', -1)">▼</button>
-                    </div>
-                </div>
-            </div>
-
-            <button class="calculate-btn" onclick="calculatePediatricBMI()">Calcular</button>
-
-            <div class="result-section" id="pediatric-result-section">
-                <div style="background: #FF6B6B; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
-                    📊 RESULTADO DEL BMI PEDIÁTRICO
-                </div>
-                <div class="bmi-value" id="pediatric-bmi-value">0</div>
-                <div class="bmi-category" id="pediatric-bmi-category">-</div>
-                <div class="bmi-description" id="pediatric-bmi-description">-</div>
-                <div class="bmi-range" id="pediatric-bmi-range">-</div>
-            </div>
-
-            </div>
-        </div>
-    </div>
 
     <script>
         let currentGender = 'male';
 
         function showScreen(screenId) {
             console.log('Mostrando pantalla:', screenId);
-            
-            // Cerrar overlay pediátrico si está abierto
-            closePediatricModal();
             
             // Ocultar todas las pantallas
             const screens = document.querySelectorAll('.screen');
@@ -1493,19 +1460,18 @@
                 console.error('Pantalla no encontrada:', screenId);
             }
             
-            // Actualizar navegación activa solo si no es la pantalla pediátrica
-            if (screenId !== 'pediatric-screen') {
-                const navItems = document.querySelectorAll('.nav-item');
-                navItems.forEach(item => item.classList.remove('active'));
-                
-                if (screenId === 'calculator-screen') {
-                    navItems[0].classList.add('active');
-                } else if (screenId === 'meter-screen') {
-                    navItems[1].classList.add('active');
-                } else if (screenId === 'stats-screen') {
-                    navItems[2].classList.add('active');
-                }
-                
+            // Actualizar navegación activa
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => item.classList.remove('active'));
+            
+            if (screenId === 'calculator-screen') {
+                navItems[0].classList.add('active');
+            } else if (screenId === 'meter-screen') {
+                navItems[1].classList.add('active');
+            } else if (screenId === 'stats-screen') {
+                navItems[2].classList.add('active');
+            } else if (screenId === 'pediatric-screen') {
+                navItems[3].classList.add('active');
             }
         }
 
@@ -1780,6 +1746,26 @@
             
         }
 
+        // Función para actualizar colores según género de la pantalla pediátrica
+        function updatePediatricScreenColors(gender) {
+            const pediatricScreen = document.getElementById('pediatric-screen');
+            const bottomNavs = document.querySelectorAll('.bottom-nav');
+            
+            // Remover clases de género existentes
+            pediatricScreen.classList.remove('pediatric-gender-male', 'pediatric-gender-female');
+            bottomNavs.forEach(nav => nav.classList.remove('pediatric-gender-male', 'pediatric-gender-female'));
+            
+            // Agregar clase de género correspondiente
+            if (gender === 'male') {
+                pediatricScreen.classList.add('pediatric-gender-male');
+                bottomNavs.forEach(nav => nav.classList.add('pediatric-gender-male'));
+            } else {
+                pediatricScreen.classList.add('pediatric-gender-female');
+                bottomNavs.forEach(nav => nav.classList.add('pediatric-gender-female'));
+            }
+            
+        }
+
 
         // Event listeners para botones de género de calculadora principal
         document.querySelectorAll('.gender-btn').forEach(btn => {
@@ -1795,7 +1781,7 @@
         // Event listener para botón del menú (solo en pantalla principal)
         document.querySelectorAll('#calculator-screen .menu-btn').forEach(btn => {
             btn.addEventListener('click', function() {
-                openPediatricModal();
+                showScreen('pediatric-screen');
             });
         });
 
@@ -1805,19 +1791,10 @@
                 document.querySelectorAll('.pediatric-gender-btn').forEach(b => b.classList.remove('active'));
                 this.classList.add('active');
                 const gender = this.dataset.gender;
-                updatePediatricColors(gender);
+                updatePediatricScreenColors(gender);
             });
         });
 
-        // Event listeners para botones de género en overlay pediátrico
-        document.querySelectorAll('#pediatric-overlay .pediatric-gender-btn').forEach(btn => {
-            btn.addEventListener('click', function() {
-                document.querySelectorAll('#pediatric-overlay .pediatric-gender-btn').forEach(b => b.classList.remove('active'));
-                this.classList.add('active');
-                const gender = this.dataset.gender;
-                updatePediatricColors(gender);
-            });
-        });
 
 
         // Función para abrir modal adulto
@@ -1858,19 +1835,24 @@
 
         // Función para abrir modal pediátrico
         function openPediatricBMIModal() {
+            console.log('Abriendo modal pediátrico...');
             const modal = document.getElementById('pediatric-bmi-modal');
             if (modal) {
+                console.log('Modal encontrado, agregando clase show');
                 modal.classList.add('show');
                 
-                // Aplicar colores según género actual del overlay pediátrico
-                const pediatricOverlay = document.getElementById('pediatric-overlay');
-                if (pediatricOverlay.classList.contains('pediatric-gender-male')) {
+                // Aplicar colores según género actual de la pantalla pediátrica
+                const pediatricScreen = document.getElementById('pediatric-screen');
+                if (pediatricScreen.classList.contains('pediatric-gender-male')) {
                     modal.classList.add('pediatric-gender-male');
                     modal.classList.remove('pediatric-gender-female');
-                } else if (pediatricOverlay.classList.contains('pediatric-gender-female')) {
+                } else if (pediatricScreen.classList.contains('pediatric-gender-female')) {
                     modal.classList.add('pediatric-gender-female');
                     modal.classList.remove('pediatric-gender-male');
                 }
+                console.log('Modal pediátrico abierto con clases:', modal.classList.toString());
+            } else {
+                console.log('Modal pediátrico no encontrado');
             }
         }
 
@@ -1894,23 +1876,6 @@
             showScreen('meter-screen');
         }
 
-        // Función para abrir overlay pediátrico
-        function openPediatricModal() {
-            const overlay = document.getElementById('pediatric-overlay');
-            overlay.classList.add('show');
-        }
-
-        // Función para cerrar overlay pediátrico
-        function closePediatricModal() {
-            const overlay = document.getElementById('pediatric-overlay');
-            overlay.classList.remove('show');
-        }
-
-        // Función para navegar desde el overlay pediátrico
-        function navigateFromPediatric(screenId) {
-            closePediatricModal();
-            showScreen(screenId);
-        }
 
         // Función para calcular IMC pediátrico
         function calculatePediatricBMI() {
@@ -1918,7 +1883,7 @@
             const age = parseInt(document.getElementById('pediatric-age').value) || 0;
             const weight = parseFloat(document.getElementById('pediatric-weight').value) || 0;
             const height = parseFloat(document.getElementById('pediatric-height').value) || 0;
-            const gender = document.querySelector('#pediatric-overlay .pediatric-gender-btn.active').dataset.gender;
+            const gender = document.querySelector('#pediatric-screen .pediatric-gender-btn.active').dataset.gender;
             
             console.log('Datos pediátricos:', {age, weight, height, gender});
 
@@ -1987,6 +1952,7 @@
             // Abrir modal
             console.log('Abriendo modal pediátrico...');
             openPediatricBMIModal();
+            console.log('Modal pediátrico debería estar visible ahora');
             
             // Pequeño delay para asegurar que el modal se abra
             setTimeout(() => {
@@ -2045,7 +2011,7 @@
             
             // Inicializar colores según género por defecto (masculino)
             updateCalculatorColors('male');
-            updatePediatricColors('male');
+            updatePediatricScreenColors('male');
             
             // Agregar animaciones de clic a todos los elementos de navegación
             const navItems = document.querySelectorAll('.nav-item');
