@@ -1,0 +1,2020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de IMC</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'TT Lakes Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+            color: #333;
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+
+        .phone-container {
+            width: 375px;
+            height: 812px;
+            margin: 20px auto;
+            background: #000;
+            border-radius: 40px;
+            padding: 8px;
+            box-shadow: 0 0 30px rgba(0,0,0,0.5);
+            position: relative;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            border-radius: 32px;
+            overflow: hidden;
+            position: relative;
+            display: none;
+            padding-bottom: 60px; /* Espacio para la navegación fija */
+        }
+
+        .screen.active {
+            display: block;
+        }
+
+        /* Pantalla Principal - BMI Calculator */
+        .bmi-content {
+            padding: 20px;
+            height: calc(100% - 60px);
+            display: flex;
+            flex-direction: column;
+            padding-bottom: 80px; /* Espacio para la navegación */
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 5px;
+        }
+
+
+        .app-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+        }
+
+        .menu-btn {
+            width: 24px;
+            height: 24px;
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 18px;
+            color: #ffffff;
+        }
+
+        .gender-selection {
+            margin-bottom: 30px;
+        }
+
+        .gender-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .gender-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #6B7280;
+            border-radius: 12px;
+            background: #374151;
+            color: #9CA3AF;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .gender-btn.active {
+            border-color: #34C759;
+            background: #34C759;
+            color: white;
+        }
+
+        /* Colores dinámicos para género masculino (celeste) */
+        .gender-male .gender-btn.active {
+            border-color: #4A90E2;
+            background: #4A90E2;
+            color: white;
+        }
+
+        .gender-male .arrow-btn {
+            border-color: #4A90E2;
+            background: #4A90E2;
+            color: white;
+        }
+
+        .gender-male .arrow-btn:hover {
+            background: #357ABD;
+        }
+
+        .gender-male .calculate-btn {
+            background: #4A90E2;
+        }
+
+        .gender-male .calculate-btn:hover {
+            background: #357ABD;
+        }
+
+        .gender-male .input-field:focus {
+            border-color: #4A90E2;
+        }
+
+        .gender-male .unit-btn.active {
+            background: #4A90E2;
+            border-color: #4A90E2;
+        }
+
+        /* Colores dinámicos para género femenino (rosado) */
+        .gender-female .gender-btn.active {
+            border-color: #E91E63;
+            background: #E91E63;
+            color: white;
+        }
+
+        .gender-female .arrow-btn {
+            border-color: #E91E63;
+            background: #E91E63;
+            color: white;
+        }
+
+        .gender-female .arrow-btn:hover {
+            background: #C2185B;
+        }
+
+        .gender-female .calculate-btn {
+            background: #E91E63;
+        }
+
+        .gender-female .calculate-btn:hover {
+            background: #C2185B;
+        }
+
+        .gender-female .input-field:focus {
+            border-color: #E91E63;
+        }
+
+        .gender-female .unit-btn.active {
+            background: #E91E63;
+            border-color: #E91E63;
+        }
+
+        .gender-icon {
+            font-size: 24px;
+        }
+
+        .gender-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .input-section {
+            margin-bottom: 25px;
+        }
+
+        .input-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .input-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .input-field {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #374151;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            background: #2d2d2d;
+            color: #ffffff;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: #34C759;
+        }
+
+        .input-arrows {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .arrow-btn {
+            width: 30px;
+            height: 30px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .arrow-btn:hover {
+            background: #F3F4F6;
+        }
+
+        .height-inputs {
+            display: flex;
+            gap: 10px;
+        }
+
+        .height-field {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #E5E7EB;
+            border-radius: 12px;
+            font-size: 16px;
+            text-align: center;
+            background: white;
+        }
+
+        .unit-toggle {
+            display: flex;
+            gap: 5px;
+            margin-left: 10px;
+        }
+
+        .unit-btn {
+            padding: 8px 12px;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+            background: white;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .unit-btn.active {
+            background: #34C759;
+            color: white;
+            border-color: #34C759;
+        }
+
+        .calculate-btn {
+            background: #34C759;
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .calculate-btn:hover {
+            background: #2FB54E;
+        }
+
+        .result-section {
+            margin-top: 30px;
+            padding: 25px;
+            background: linear-gradient(135deg, #F9FAFB 0%, #E5E7EB 100%);
+            border-radius: 16px;
+            text-align: center;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #E5E7EB;
+            animation: slideIn 0.5s ease-out;
+            min-height: 200px;
+        }
+
+        .result-section.show {
+            display: block !important;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .bmi-value {
+            font-size: 56px;
+            font-weight: bold;
+            color: #34C759;
+            margin-bottom: 15px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .bmi-category {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bmi-description {
+            font-size: 16px;
+            color: #6B7280;
+            line-height: 1.5;
+            max-width: 280px;
+            margin: 0 auto;
+        }
+
+        .bmi-range {
+            margin-top: 15px;
+            padding: 10px;
+            background: rgba(52, 199, 89, 0.1);
+            border-radius: 8px;
+            font-size: 14px;
+            color: #34C759;
+            font-weight: 600;
+        }
+
+        /* Overlay Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.show {
+            display: flex;
+        }
+
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 350px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            position: relative;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #6B7280;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-close:hover {
+            background: #F3F4F6;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1F2937;
+            margin-bottom: 20px;
+        }
+
+        .modal-bmi-value {
+            font-size: 64px;
+            font-weight: bold;
+            color: #34C759;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Colores dinámicos para modal adulto masculino (celeste) */
+        .gender-male .modal-bmi-value {
+            color: #4A90E2;
+        }
+
+        .gender-male .modal-bmi-range {
+            background: rgba(74, 144, 226, 0.1);
+            color: #4A90E2;
+        }
+
+        .gender-male .modal-btn-primary {
+            background: #4A90E2;
+        }
+
+        .gender-male .modal-btn-primary:hover {
+            background: #357ABD;
+        }
+
+        /* Colores dinámicos para modal adulto femenino (rosado) */
+        .gender-female .modal-bmi-value {
+            color: #E91E63;
+        }
+
+        .gender-female .modal-bmi-range {
+            background: rgba(233, 30, 99, 0.1);
+            color: #E91E63;
+        }
+
+        .gender-female .modal-btn-primary {
+            background: #E91E63;
+        }
+
+        .gender-female .modal-btn-primary:hover {
+            background: #C2185B;
+        }
+
+        .modal-bmi-category {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .modal-bmi-description {
+            font-size: 16px;
+            color: #6B7280;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .modal-bmi-range {
+            padding: 12px;
+            background: rgba(52, 199, 89, 0.1);
+            border-radius: 10px;
+            font-size: 14px;
+            color: #34C759;
+            font-weight: 600;
+            margin-bottom: 25px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .modal-btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 25px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn-primary {
+            background: #34C759;
+            color: white;
+        }
+
+        .modal-btn-primary:hover {
+            background: #2FB54E;
+        }
+
+        .modal-btn-secondary {
+            background: #F3F4F6;
+            color: #6B7280;
+        }
+
+        .modal-btn-secondary:hover {
+            background: #E5E7EB;
+        }
+
+        /* Overlay Pediátrico de Pantalla Completa */
+        .pediatric-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #1a1a1a;
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+        }
+
+
+        /* Modal Pediátrico debe estar por encima del overlay */
+        #pediatric-bmi-modal {
+            z-index: 1001 !important;
+        }
+
+        .pediatric-overlay.show {
+            display: flex;
+        }
+
+
+        .pediatric-overlay .bmi-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+
+
+
+        .pediatric-content {
+            text-align: center;
+        }
+
+
+
+        .pediatric-header {
+            margin-bottom: 25px;
+        }
+
+        .pediatric-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+        }
+
+        .pediatric-subtitle {
+            font-size: 16px;
+            color: #6B7280;
+            font-weight: 500;
+        }
+
+        .pediatric-form {
+            margin-bottom: 20px;
+        }
+
+        .pediatric-field {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .pediatric-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 8px;
+        }
+
+        .pediatric-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            background: white;
+        }
+
+        .pediatric-input:focus {
+            outline: none;
+            border-color: #34C759;
+        }
+
+        .pediatric-gender-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .pediatric-gender-btn {
+            flex: 1;
+            padding: 15px;
+            border: 2px solid #6B7280;
+            border-radius: 12px;
+            background: #374151;
+            color: #9CA3AF;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .pediatric-gender-btn.active {
+            border-color: #34C759;
+            background: #34C759;
+            color: white;
+        }
+
+        /* Colores dinámicos para pediátrico masculino (celeste) */
+        .pediatric-gender-male .pediatric-gender-btn.active {
+            border-color: #4A90E2;
+            background: #4A90E2;
+            color: white;
+        }
+
+        .pediatric-gender-male .arrow-btn {
+            border-color: #4A90E2;
+            background: #4A90E2;
+            color: white;
+        }
+
+        .pediatric-gender-male .arrow-btn:hover {
+            background: #357ABD;
+        }
+
+        .pediatric-gender-male .calculate-btn {
+            background: #4A90E2;
+        }
+
+        .pediatric-gender-male .calculate-btn:hover {
+            background: #357ABD;
+        }
+
+        .pediatric-gender-male .pediatric-input:focus {
+            border-color: #4A90E2;
+        }
+
+        /* Colores dinámicos para pediátrico femenino (rosado) */
+        .pediatric-gender-female .pediatric-gender-btn.active {
+            border-color: #E91E63;
+            background: #E91E63;
+            color: white;
+        }
+
+        .pediatric-gender-female .arrow-btn {
+            border-color: #E91E63;
+            background: #E91E63;
+            color: white;
+        }
+
+        .pediatric-gender-female .arrow-btn:hover {
+            background: #C2185B;
+        }
+
+        .pediatric-gender-female .calculate-btn {
+            background: #E91E63;
+        }
+
+        .pediatric-gender-female .calculate-btn:hover {
+            background: #C2185B;
+        }
+
+        .pediatric-gender-female .pediatric-input:focus {
+            border-color: #E91E63;
+        }
+
+        /* Colores dinámicos para modal pediátrico masculino (celeste) */
+        .pediatric-gender-male .modal-bmi-value {
+            color: #4A90E2;
+        }
+
+        .pediatric-gender-male .modal-bmi-range {
+            background: rgba(74, 144, 226, 0.1);
+            color: #4A90E2;
+        }
+
+        .pediatric-gender-male .modal-btn-primary {
+            background: #4A90E2;
+        }
+
+        .pediatric-gender-male .modal-btn-primary:hover {
+            background: #357ABD;
+        }
+
+        /* Colores dinámicos para modal pediátrico femenino (rosado) */
+        .pediatric-gender-female .modal-bmi-value {
+            color: #E91E63;
+        }
+
+        .pediatric-gender-female .modal-bmi-range {
+            background: rgba(233, 30, 99, 0.1);
+            color: #E91E63;
+        }
+
+        .pediatric-gender-female .modal-btn-primary {
+            background: #E91E63;
+        }
+
+        .pediatric-gender-female .modal-btn-primary:hover {
+            background: #C2185B;
+        }
+
+        .pediatric-gender-icon {
+            font-size: 24px;
+        }
+
+        .pediatric-gender-label {
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .pediatric-calculate-btn {
+            width: 100%;
+            background: #34C759;
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        .pediatric-calculate-btn:hover {
+            background: #2FB54E;
+        }
+
+        .pediatric-result {
+            background: #F9FAFB;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid #34C759;
+        }
+
+        .pediatric-bmi-value {
+            font-size: 48px;
+            font-weight: bold;
+            color: #34C759;
+            margin-bottom: 10px;
+        }
+
+        .pediatric-bmi-category {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1F2937;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+        }
+
+        .pediatric-bmi-description {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .pediatric-bmi-percentile {
+            font-size: 14px;
+            color: #34C759;
+            font-weight: 600;
+        }
+
+        /* Navegación Inferior */
+        .bottom-nav {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 320px;
+            height: 60px;
+            background: #2d2d2d;
+            border: 1px solid #374151;
+            border-radius: 30px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            z-index: 9999;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            padding: 8px;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+        }
+
+        .nav-item:active {
+            transform: scale(0.95);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Animación de ripple para el clic */
+        .nav-item {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+            pointer-events: none;
+        }
+
+        .nav-item:active::before,
+        .nav-item.touching::before {
+            width: 60px;
+            height: 60px;
+        }
+
+        .nav-item.active {
+            color: #34C759;
+        }
+
+        .nav-icon {
+            font-size: 20px;
+        }
+
+        .nav-label {
+            font-size: 10px;
+            color: #6B7280;
+        }
+
+        .nav-item.active .nav-label {
+            color: #34C759;
+        }
+
+        /* Colores dinámicos para iconos de navegación masculino (celeste) */
+        .gender-male .nav-item.active {
+            color: #4A90E2;
+        }
+
+        .gender-male .nav-item.active .nav-label {
+            color: #4A90E2;
+        }
+
+        /* Todos los iconos de navegación en blanco */
+        .nav-item img {
+            filter: brightness(0) invert(1) !important;
+            transition: all 0.2s ease;
+        }
+
+        .nav-item:active img,
+        .nav-item.touching img {
+            transform: scale(0.9);
+            filter: brightness(0) invert(1) drop-shadow(0 0 8px rgba(255, 255, 255, 0.5)) !important;
+        }
+
+        /* Animación de bounce al soltar el clic */
+        @keyframes bounceClick {
+            0% { transform: scale(0.9); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .nav-item.clicked img {
+            animation: bounceClick 0.4s ease;
+        }
+
+        /* Mejoras específicas para dispositivos táctiles */
+        @media (hover: none) and (pointer: coarse) {
+            .nav-item {
+                -webkit-tap-highlight-color: transparent;
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+            }
+            
+            .nav-item:active {
+                transform: scale(0.95);
+                background: rgba(255, 255, 255, 0.1);
+            }
+        }
+
+        /* Pantalla BMI Meter */
+        .bmi-meter-content {
+            padding: 60px 20px 20px;
+            height: calc(100% - 60px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .meter-container {
+            width: 200px;
+            height: 200px;
+            position: relative;
+            margin-bottom: 30px;
+        }
+
+        .meter-circle {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: conic-gradient(
+                #34C759 0deg 90deg,
+                #FFD700 90deg 180deg,
+                #FF8C00 180deg 270deg,
+                #FF4500 270deg 360deg
+            );
+            position: relative;
+        }
+
+        .meter-inner {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .meter-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #1F2937;
+        }
+
+        .meter-label {
+            font-size: 14px;
+            color: #6B7280;
+        }
+
+        .meter-needle {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 2px;
+            height: 80px;
+            background: #1F2937;
+            transform-origin: bottom center;
+            transform: translateX(-50%) rotate(0deg);
+            transition: transform 0.5s ease;
+        }
+
+        /* Pantalla Statistics */
+        .stats-content {
+            padding: 60px 20px 20px;
+            height: calc(100% - 60px);
+            overflow-y: auto;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: #F9FAFB;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Colores dinámicos para estadísticas masculino (celeste) */
+        .gender-male .stat-card {
+            background: #4A90E2;
+            border-color: #4A90E2;
+            color: white;
+        }
+
+        .gender-male .stat-value {
+            color: white;
+        }
+
+        .gender-male .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Colores dinámicos para estadísticas femenino (rosado) */
+        .gender-female .stat-card {
+            background: #E91E63;
+            border-color: #E91E63;
+            color: white;
+        }
+
+        .gender-female .stat-value {
+            color: white;
+        }
+
+        .gender-female .stat-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: #34C759;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #6B7280;
+        }
+
+        .chart-container {
+            background: #F9FAFB;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        /* Colores dinámicos para gráficos masculino (celeste) */
+        .gender-male .chart-container {
+            background: #4A90E2;
+            border-color: #4A90E2;
+        }
+
+        .gender-male .chart-title {
+            color: white;
+        }
+
+        .gender-male .chart-fill {
+            background: white;
+        }
+
+        .gender-male .chart-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Colores dinámicos para gráficos femenino (rosado) */
+        .gender-female .chart-container {
+            background: #E91E63;
+            border-color: #E91E63;
+        }
+
+        .gender-female .chart-title {
+            color: white;
+        }
+
+        .gender-female .chart-fill {
+            background: white;
+        }
+
+        .gender-female .chart-label {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .chart-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #1F2937;
+            margin-bottom: 15px;
+        }
+
+        .chart-bar {
+            height: 20px;
+            background: #E5E7EB;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-fill {
+            height: 100%;
+            background: #4B5563;
+            border-radius: 10px;
+            transition: width 0.5s ease;
+            border: none;
+        }
+
+        /* Color turquesa para barras de progreso masculino */
+        .gender-male .chart-fill {
+            background: #4DD6D4;
+        }
+
+        /* Color rosa para barras de progreso femenino */
+        .gender-female .chart-fill {
+            background: #F77AA9;
+        }
+
+
+        .chart-label {
+            font-size: 12px;
+            color: #6B7280;
+            margin-bottom: 5px;
+        }
+
+        /* Responsive */
+        @media (max-width: 400px) {
+            .phone-container {
+                width: 100%;
+                height: 100vh;
+                margin: 0;
+                border-radius: 0;
+                padding: 0;
+            }
+            
+            .screen {
+                border-radius: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="phone-container">
+        <!-- Pantalla Principal - BMI Calculator -->
+        <div class="screen active" id="calculator-screen">
+            <div class="bmi-content">
+                <div class="header">
+                    <h1 class="app-title">Control de Peso</h1>
+                    <button class="menu-btn">→</button>
+                </div>
+
+                <div class="gender-selection">
+                    <label class="input-label">Género</label>
+                    <div class="gender-buttons">
+                        <button class="gender-btn active" data-gender="male">
+                            <div class="gender-icon">♂</div>
+                            <div class="gender-label">Hombre</div>
+                        </button>
+                        <button class="gender-btn" data-gender="female">
+                            <div class="gender-icon">♀</div>
+                            <div class="gender-label">Mujer</div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Edad</label>
+                    <div class="input-container">
+                        <input type="number" class="input-field" id="age" value="27" min="1" max="120">
+                        <div class="input-arrows">
+                            <button class="arrow-btn" onclick="adjustValue('age', 1)">▲</button>
+                            <button class="arrow-btn" onclick="adjustValue('age', -1)">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Altura (cm)</label>
+                    <div class="input-container">
+                        <input type="number" class="input-field" id="height-ft" value="170" min="50" max="250">
+                        <div class="input-arrows">
+                            <button class="arrow-btn" onclick="adjustValue('height-ft', 1)">▲</button>
+                            <button class="arrow-btn" onclick="adjustValue('height-ft', -1)">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-section">
+                    <label class="input-label">Peso (lbs)</label>
+                    <div class="input-container">
+                        <input type="number" class="input-field" id="weight" value="154" min="20" max="1100">
+                        <div class="input-arrows">
+                            <button class="arrow-btn" onclick="adjustValue('weight', 1)">▲</button>
+                            <button class="arrow-btn" onclick="adjustValue('weight', -1)">▼</button>
+                        </div>
+                    </div>
+                </div>
+
+                <button class="calculate-btn" onclick="calculateBMI()">Calcular</button>
+
+                <div class="result-section" id="result-section">
+                    <div style="background: #FF6B6B; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
+                        📊 RESULTADO DEL BMI
+                    </div>
+                    <div class="bmi-value" id="bmi-value">0</div>
+                    <div class="bmi-category" id="bmi-category">-</div>
+                    <div class="bmi-description" id="bmi-description">-</div>
+                    <div class="bmi-range" id="bmi-range">-</div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item active" onclick="showScreen('calculator-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/hombre.png" alt="Calculadora" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="showScreen('meter-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/productividad.png" alt="Medidor" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="showScreen('stats-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="openPediatricModal()">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla BMI Meter -->
+        <div class="screen" id="meter-screen">
+            <div class="bmi-meter-content">
+                <div class="meter-container">
+                    <div class="meter-circle">
+                        <div class="meter-inner">
+                            <div class="meter-value" id="meter-value">0</div>
+                            <div class="meter-label">BMI</div>
+                        </div>
+                        <div class="meter-needle" id="meter-needle"></div>
+                    </div>
+                </div>
+                <div class="result-section show">
+                    <div class="bmi-category" id="meter-category">-</div>
+                    <div class="bmi-description" id="meter-description">-</div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showScreen('calculator-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/hombre.png" alt="Calculadora" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item active" onclick="showScreen('meter-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/productividad.png" alt="Medidor" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="showScreen('stats-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="openPediatricModal()">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pantalla Statistics -->
+        <div class="screen" id="stats-screen">
+            <div class="stats-content">
+                <div class="header">
+                    <h1 class="app-title">Estadísticas</h1>
+                    <button class="menu-btn">→</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="current-bmi">0</div>
+                        <div class="stat-label">IMC Actual</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="target-bmi">22.5</div>
+                        <div class="stat-label">IMC Objetivo</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="weight-diff">0</div>
+                        <div class="stat-label">Diferencia Peso</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="bmi-trend">↗</div>
+                        <div class="stat-label">Tendencia</div>
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <div class="chart-title">Categorías de IMC</div>
+                    <div class="chart-item">
+                        <div class="chart-label">Bajo Peso (&lt;18.5)</div>
+                        <div class="chart-bar">
+                            <div class="chart-fill" style="width: 15%"></div>
+                        </div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="chart-label">Peso Normal (18.5-24.9)</div>
+                        <div class="chart-bar">
+                            <div class="chart-fill" style="width: 60%"></div>
+                        </div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="chart-label">Sobrepeso (25-29.9)</div>
+                        <div class="chart-bar">
+                            <div class="chart-fill" style="width: 20%"></div>
+                        </div>
+                    </div>
+                    <div class="chart-item">
+                        <div class="chart-label">Obesidad (≥30)</div>
+                        <div class="chart-bar">
+                            <div class="chart-fill" style="width: 5%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-nav">
+                <div class="nav-item" onclick="showScreen('calculator-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/hombre.png" alt="Calculadora" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="showScreen('meter-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/productividad.png" alt="Medidor" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item active" onclick="showScreen('stats-screen')">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/grafico.png" alt="Estadísticas" style="width: 40px; height: 40px;"></div>
+                </div>
+                <div class="nav-item" onclick="openPediatricModal()">
+                    <div class="nav-icon" style="display: flex; justify-content: center; align-items: center;"><img src="images/bebe.png" alt="Pediatrico" style="width: 40px; height: 40px;"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay para Resultado IMC -->
+    <div class="modal-overlay" id="bmi-modal">
+        <div class="modal-content">
+            <div class="modal-title">Tu Resultado</div>
+            <div class="modal-bmi-value" id="modal-bmi-value">0</div>
+            <div class="modal-bmi-category" id="modal-bmi-category">-</div>
+            <div class="modal-bmi-description" id="modal-bmi-description">-</div>
+            <div class="modal-bmi-range" id="modal-bmi-range">-</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-primary" onclick="closeBMIModalAndShowMeter()">Ver Medidor</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeBMIModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Overlay para Resultado IMC Pediátrico -->
+    <div class="modal-overlay" id="pediatric-bmi-modal">
+        <div class="modal-content">
+            <div class="modal-title">Resultado Pediátrico</div>
+            <div class="modal-bmi-value" id="pediatric-modal-bmi-value">0</div>
+            <div class="modal-bmi-category" id="pediatric-modal-bmi-category">-</div>
+            <div class="modal-bmi-description" id="pediatric-modal-bmi-description">-</div>
+            <div class="modal-bmi-range" id="pediatric-modal-bmi-percentile">-</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-primary" onclick="closePediatricBMIModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overlay para Control Pediátrico -->
+    <div class="pediatric-overlay" id="pediatric-overlay">
+        <div class="bmi-content">
+            <div class="header">
+                <h1 class="app-title">Control de Peso</h1>
+                <button class="menu-btn" onclick="closePediatricModal()">←</button>
+            </div>
+
+            <div class="gender-selection">
+                <label class="input-label">Género</label>
+                <div class="pediatric-gender-buttons">
+                    <button class="pediatric-gender-btn active" data-gender="male">
+                        <div class="pediatric-gender-icon">♂</div>
+                        <div class="pediatric-gender-label">Niño</div>
+                    </button>
+                    <button class="pediatric-gender-btn" data-gender="female">
+                        <div class="pediatric-gender-icon">♀</div>
+                        <div class="pediatric-gender-label">Niña</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label class="input-label">Edad</label>
+                <div class="input-container">
+                    <input type="number" class="input-field" id="pediatric-age" value="8" min="2" max="17">
+                    <div class="input-arrows">
+                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', 1)">▲</button>
+                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', -1)">▼</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label class="input-label">Altura (cm)</label>
+                <div class="input-container">
+                    <input type="number" class="input-field" id="pediatric-height" value="120" min="50" max="200">
+                    <div class="input-arrows">
+                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-height', 1)">▲</button>
+                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-height', -1)">▼</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="input-section">
+                <label class="input-label">Peso (lbs)</label>
+                <div class="input-container">
+                    <input type="number" class="input-field" id="pediatric-weight" value="55" min="10" max="220">
+                    <div class="input-arrows">
+                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-weight', 1)">▲</button>
+                        <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-weight', -1)">▼</button>
+                    </div>
+                </div>
+            </div>
+
+            <button class="calculate-btn" onclick="calculatePediatricBMI()">Calcular</button>
+
+        </div>
+    </div>
+
+    <script>
+        let currentGender = 'male';
+
+        function showScreen(screenId) {
+            console.log('Mostrando pantalla:', screenId);
+            
+            // Cerrar overlay pediátrico si está abierto
+            closePediatricModal();
+            
+            // Ocultar todas las pantallas
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(screen => screen.classList.remove('active'));
+            
+            // Mostrar la pantalla seleccionada
+            const selectedScreen = document.getElementById(screenId);
+            if (selectedScreen) {
+                selectedScreen.classList.add('active');
+                console.log('Pantalla activada:', screenId);
+            } else {
+                console.error('Pantalla no encontrada:', screenId);
+            }
+            
+            // Actualizar navegación activa solo si no es la pantalla pediátrica
+            if (screenId !== 'pediatric-screen') {
+                const navItems = document.querySelectorAll('.nav-item');
+                navItems.forEach(item => item.classList.remove('active'));
+                
+                if (screenId === 'calculator-screen') {
+                    navItems[0].classList.add('active');
+                } else if (screenId === 'meter-screen') {
+                    navItems[1].classList.add('active');
+                } else if (screenId === 'stats-screen') {
+                    navItems[2].classList.add('active');
+                }
+                
+            }
+        }
+
+        // Función para agregar animación de clic a los elementos de navegación
+        function addClickAnimation(element) {
+            element.classList.add('clicked');
+            setTimeout(() => {
+                element.classList.remove('clicked');
+            }, 400);
+        }
+
+        // Función para manejar eventos táctiles en móviles
+        function addTouchAnimation(element) {
+            element.classList.add('touching');
+            setTimeout(() => {
+                element.classList.remove('touching');
+            }, 200);
+        }
+
+        function adjustValue(fieldId, change) {
+            const field = document.getElementById(fieldId);
+            let value = parseInt(field.value) || 0;
+            value += change;
+            
+            if (fieldId === 'age') {
+                value = Math.max(1, Math.min(120, value));
+            } else if (fieldId === 'weight') {
+                value = Math.max(20, Math.min(1100, value));
+            }
+            
+            field.value = value;
+        }
+
+        // Función para ajustar valores pediátricos
+        function adjustPediatricValue(fieldId, change) {
+            const field = document.getElementById(fieldId);
+            let value = parseInt(field.value) || 0;
+            value += change;
+            
+            if (fieldId === 'pediatric-age') {
+                value = Math.max(2, Math.min(17, value));
+            } else if (fieldId === 'pediatric-weight') {
+                value = Math.max(10, Math.min(220, value));
+            } else if (fieldId === 'pediatric-height') {
+                value = Math.max(50, Math.min(200, value));
+            }
+            
+            field.value = value;
+        }
+
+        function calculateBMI() {
+            // Obtener valores
+            const age = parseInt(document.getElementById('age').value) || 0;
+            const weight = parseFloat(document.getElementById('weight').value) || 0;
+            let height = 0;
+
+            // Validar datos básicos
+            if (age <= 0 || weight <= 0) {
+                alert('Por favor ingresa valores válidos para edad y peso');
+                return;
+            }
+
+            // Calcular altura en metros (siempre desde cm)
+            const heightCm = parseFloat(document.getElementById('height-ft').value) || 0;
+            height = heightCm / 100; // cm to meters
+            console.log('Height calculation (cm):', {heightCm, height});
+
+            // Validar altura
+            if (height <= 0) {
+                alert('Por favor ingresa una altura válida');
+                return;
+            }
+
+            // Convertir peso a kg (siempre desde libras)
+            const weightKg = weight * 0.453592; // Convert lbs to kg
+
+            // Calcular BMI
+            const bmi = weightKg / (height * height);
+            const roundedBMI = Math.round(bmi * 10) / 10;
+
+            console.log('BMI Calculation:', {
+                age, weight, height, weightKg, bmi, roundedBMI
+            });
+
+            // Mostrar resultado en modal
+            console.log('Setting BMI values:', roundedBMI);
+            document.getElementById('bmi-value').textContent = roundedBMI;
+            document.getElementById('meter-value').textContent = roundedBMI;
+            document.getElementById('current-bmi').textContent = roundedBMI;
+            
+            // Actualizar modal
+            document.getElementById('modal-bmi-value').textContent = roundedBMI;
+
+            // Categoría BMI
+            let category = '';
+            let description = '';
+            let color = '';
+            let range = '';
+
+            // IMC adulto (siempre para la pantalla principal)
+            if (bmi < 18.5) {
+                category = 'Bajo Peso';
+                description = 'Tienes bajo peso. Considera ganar peso de forma saludable.';
+                color = '#FFD700';
+                range = 'Rango: < 18.5';
+            } else if (bmi < 25) {
+                category = 'Peso Normal';
+                description = '¡Tienes un peso saludable! Mantén este estilo de vida.';
+                color = '#34C759';
+                range = 'Rango: 18.5 - 24.9';
+            } else if (bmi < 30) {
+                category = 'Sobrepeso';
+                description = 'Tienes sobrepeso. Considera perder peso de forma saludable.';
+                color = '#FF8C00';
+                range = 'Rango: 25.0 - 29.9';
+            } else {
+                category = 'Obesidad';
+                description = 'Tienes obesidad. Consulta con un profesional de la salud.';
+                color = '#FF4500';
+                range = 'Rango: ≥ 30.0';
+            }
+
+            document.getElementById('bmi-category').textContent = category;
+            document.getElementById('bmi-description').textContent = description;
+            document.getElementById('bmi-range').textContent = range;
+            document.getElementById('meter-category').textContent = category;
+            document.getElementById('meter-description').textContent = description;
+
+            // Actualizar modal
+            document.getElementById('modal-bmi-category').textContent = category;
+            document.getElementById('modal-bmi-description').textContent = description;
+            document.getElementById('modal-bmi-range').textContent = range;
+
+            // Mostrar modal overlay
+            openBMIModal();
+            
+            console.log('BMI Modal should be visible now');
+
+            // Actualizar medidor
+            updateMeter(bmi);
+
+            // Calcular diferencia de peso
+            const targetWeight = 22.5 * height * height;
+            const weightDifference = Math.round((weightKg - targetWeight) * 10) / 10;
+            document.getElementById('weight-diff').textContent = weightDifference > 0 ? `+${weightDifference}` : weightDifference;
+
+            // Cambiar color del resultado según categoría
+            resultSection.style.borderLeft = `4px solid ${color}`;
+            
+            // Scroll hacia el resultado
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function updateMeter(bmi) {
+            const needle = document.getElementById('meter-needle');
+            let angle = 0;
+
+            if (bmi < 18.5) {
+                angle = (bmi / 18.5) * 90; // 0-90 degrees
+            } else if (bmi < 25) {
+                angle = 90 + ((bmi - 18.5) / 6.5) * 90; // 90-180 degrees
+            } else if (bmi < 30) {
+                angle = 180 + ((bmi - 25) / 5) * 90; // 180-270 degrees
+            } else {
+                angle = 270 + Math.min(((bmi - 30) / 10) * 90, 90); // 270-360 degrees
+            }
+
+            needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+        }
+
+        // Función para calcular percentiles de IMC pediátrico
+        function calculateBMIPercentile(bmi, age, gender) {
+            // Datos aproximados de percentiles de IMC por edad y género
+            // Estos son valores simplificados para demostración
+            const malePercentiles = {
+                2: [13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6, 25.4, 26.2, 27.0],
+                3: [13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2, 25.0, 25.8, 26.6],
+                4: [12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0, 24.8, 25.6, 26.4],
+                5: [12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6, 25.4, 26.2],
+                6: [12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6, 24.4, 25.2, 26.0],
+                7: [12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2, 25.0, 25.8],
+                8: [12.0, 12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0, 24.8, 25.6],
+                9: [11.8, 12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6, 25.4],
+                10: [11.6, 12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6, 24.4, 25.2],
+                11: [11.4, 12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2, 25.0],
+                12: [11.2, 12.0, 12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0, 24.8],
+                13: [11.0, 11.8, 12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6],
+                14: [10.8, 11.6, 12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6, 24.4],
+                15: [10.6, 11.4, 12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2],
+                16: [10.4, 11.2, 12.0, 12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0],
+                17: [10.2, 11.0, 11.8, 12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8]
+            };
+
+            const femalePercentiles = {
+                2: [13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2, 25.0, 25.8, 26.6],
+                3: [12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6, 25.4, 26.2],
+                4: [12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6, 24.4, 25.2, 26.0],
+                5: [12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2, 25.0, 25.8],
+                6: [12.0, 12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0, 24.8, 25.6],
+                7: [11.8, 12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6, 25.4],
+                8: [11.6, 12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6, 24.4, 25.2],
+                9: [11.4, 12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2, 25.0],
+                10: [11.2, 12.0, 12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0, 24.8],
+                11: [11.0, 11.8, 12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8, 24.6],
+                12: [10.8, 11.6, 12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6, 24.4],
+                13: [10.6, 11.4, 12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4, 24.2],
+                14: [10.4, 11.2, 12.0, 12.8, 13.6, 14.4, 15.2, 16.0, 16.8, 17.6, 18.4, 19.2, 20.0, 20.8, 21.6, 22.4, 23.2, 24.0],
+                15: [10.2, 11.0, 11.8, 12.6, 13.4, 14.2, 15.0, 15.8, 16.6, 17.4, 18.2, 19.0, 19.8, 20.6, 21.4, 22.2, 23.0, 23.8],
+                16: [10.0, 10.8, 11.6, 12.4, 13.2, 14.0, 14.8, 15.6, 16.4, 17.2, 18.0, 18.8, 19.6, 20.4, 21.2, 22.0, 22.8, 23.6],
+                17: [9.8, 10.6, 11.4, 12.2, 13.0, 13.8, 14.6, 15.4, 16.2, 17.0, 17.8, 18.6, 19.4, 20.2, 21.0, 21.8, 22.6, 23.4]
+            };
+
+            const percentiles = gender === 'male' ? malePercentiles : femalePercentiles;
+            const ageData = percentiles[age];
+            
+            if (!ageData) {
+                // Si no hay datos para esa edad, usar interpolación simple
+                return Math.min(Math.max((bmi - 12) / 15 * 100, 0), 100);
+            }
+
+            // Encontrar el percentil más cercano
+            for (let i = 0; i < ageData.length; i++) {
+                if (bmi <= ageData[i]) {
+                    return (i + 1) * 5; // Percentiles de 5 en 5
+                }
+            }
+            
+            return 100; // Si está por encima del percentil 95
+        }
+
+        // Función para actualizar colores según género de calculadora principal
+        function updateCalculatorColors(gender) {
+            const calculatorScreen = document.getElementById('calculator-screen');
+            const statsScreen = document.getElementById('stats-screen');
+            const bottomNavs = document.querySelectorAll('.bottom-nav');
+            
+            // Remover clases de género existentes
+            calculatorScreen.classList.remove('gender-male', 'gender-female');
+            statsScreen.classList.remove('gender-male', 'gender-female');
+            bottomNavs.forEach(nav => nav.classList.remove('gender-male', 'gender-female'));
+            
+            // Agregar clase de género correspondiente
+            if (gender === 'male') {
+                calculatorScreen.classList.add('gender-male');
+                statsScreen.classList.add('gender-male');
+                bottomNavs.forEach(nav => nav.classList.add('gender-male'));
+            } else {
+                calculatorScreen.classList.add('gender-female');
+                statsScreen.classList.add('gender-female');
+                bottomNavs.forEach(nav => nav.classList.add('gender-female'));
+            }
+            
+        }
+
+        // Función para actualizar colores según género pediátrico
+        function updatePediatricColors(gender) {
+            const pediatricOverlay = document.getElementById('pediatric-overlay');
+            const bottomNavs = document.querySelectorAll('.bottom-nav');
+            
+            // Remover clases de género existentes
+            pediatricOverlay.classList.remove('pediatric-gender-male', 'pediatric-gender-female');
+            bottomNavs.forEach(nav => nav.classList.remove('pediatric-gender-male', 'pediatric-gender-female'));
+            
+            // Agregar clase de género correspondiente
+            if (gender === 'male') {
+                pediatricOverlay.classList.add('pediatric-gender-male');
+                bottomNavs.forEach(nav => nav.classList.add('pediatric-gender-male'));
+            } else {
+                pediatricOverlay.classList.add('pediatric-gender-female');
+                bottomNavs.forEach(nav => nav.classList.add('pediatric-gender-female'));
+            }
+            
+        }
+
+
+        // Event listeners para botones de género de calculadora principal
+        document.querySelectorAll('.gender-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                currentGender = this.dataset.gender;
+                updateCalculatorColors(currentGender);
+            });
+        });
+
+
+        // Event listener para botón del menú (solo en pantalla principal)
+        document.querySelectorAll('#calculator-screen .menu-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                openPediatricModal();
+            });
+        });
+
+        // Event listeners para botones de género pediátrico
+        document.querySelectorAll('.pediatric-gender-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.pediatric-gender-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const gender = this.dataset.gender;
+                updatePediatricColors(gender);
+            });
+        });
+
+        // Event listeners para botones de género en overlay pediátrico
+        document.querySelectorAll('#pediatric-overlay .pediatric-gender-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('#pediatric-overlay .pediatric-gender-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const gender = this.dataset.gender;
+                updatePediatricColors(gender);
+            });
+        });
+
+
+        // Función para abrir modal adulto
+        function openBMIModal() {
+            console.log('Abriendo modal adulto...');
+            const modal = document.getElementById('bmi-modal');
+            if (modal) {
+                console.log('Modal encontrado, agregando clase show');
+                modal.classList.add('show');
+                
+                // Aplicar colores según género actual
+                const calculatorScreen = document.getElementById('calculator-screen');
+                if (calculatorScreen.classList.contains('gender-male')) {
+                    modal.classList.add('gender-male');
+                    modal.classList.remove('gender-female');
+                } else if (calculatorScreen.classList.contains('gender-female')) {
+                    modal.classList.add('gender-female');
+                    modal.classList.remove('gender-male');
+                }
+                
+                console.log('Clases del modal:', modal.classList.toString());
+            } else {
+                console.log('Modal no encontrado');
+            }
+        }
+
+        // Función para cerrar modal
+        function closeBMIModal() {
+            const modal = document.getElementById('bmi-modal');
+            modal.classList.remove('show', 'gender-male', 'gender-female');
+        }
+
+        // Función para cerrar modal adulto y mostrar medidor
+        function closeBMIModalAndShowMeter() {
+            closeBMIModal();
+            showScreen('meter-screen');
+        }
+
+        // Función para abrir modal pediátrico
+        function openPediatricBMIModal() {
+            const modal = document.getElementById('pediatric-bmi-modal');
+            if (modal) {
+                modal.classList.add('show');
+                
+                // Aplicar colores según género actual del overlay pediátrico
+                const pediatricOverlay = document.getElementById('pediatric-overlay');
+                if (pediatricOverlay.classList.contains('pediatric-gender-male')) {
+                    modal.classList.add('pediatric-gender-male');
+                    modal.classList.remove('pediatric-gender-female');
+                } else if (pediatricOverlay.classList.contains('pediatric-gender-female')) {
+                    modal.classList.add('pediatric-gender-female');
+                    modal.classList.remove('pediatric-gender-male');
+                }
+            }
+        }
+
+        // Función para cerrar modal pediátrico
+        function closePediatricBMIModal() {
+            console.log('Cerrando modal pediátrico...');
+            const modal = document.getElementById('pediatric-bmi-modal');
+            if (modal) {
+                console.log('Modal encontrado, clases antes:', modal.classList.toString());
+                modal.classList.remove('show', 'pediatric-gender-male', 'pediatric-gender-female');
+                console.log('Clases después:', modal.classList.toString());
+                console.log('Modal cerrado');
+            } else {
+                console.log('Modal no encontrado');
+            }
+        }
+
+        // Función para cerrar modal pediátrico y mostrar medidor
+        function closePediatricBMIModalAndShowMeter() {
+            closePediatricBMIModal();
+            showScreen('meter-screen');
+        }
+
+        // Función para abrir overlay pediátrico
+        function openPediatricModal() {
+            const overlay = document.getElementById('pediatric-overlay');
+            overlay.classList.add('show');
+        }
+
+        // Función para cerrar overlay pediátrico
+        function closePediatricModal() {
+            const overlay = document.getElementById('pediatric-overlay');
+            overlay.classList.remove('show');
+        }
+
+        // Función para navegar desde el overlay pediátrico
+        function navigateFromPediatric(screenId) {
+            closePediatricModal();
+            showScreen(screenId);
+        }
+
+        // Función para calcular IMC pediátrico
+        function calculatePediatricBMI() {
+            console.log('Calculando IMC pediátrico...');
+            const age = parseInt(document.getElementById('pediatric-age').value) || 0;
+            const weight = parseFloat(document.getElementById('pediatric-weight').value) || 0;
+            const height = parseFloat(document.getElementById('pediatric-height').value) || 0;
+            const gender = document.querySelector('#pediatric-overlay .pediatric-gender-btn.active').dataset.gender;
+            
+            console.log('Datos pediátricos:', {age, weight, height, gender});
+
+            // Validar datos
+            if (age < 2 || age > 17) {
+                alert('La edad debe estar entre 2 y 17 años');
+                return;
+            }
+
+            if (weight <= 0 || height <= 0) {
+                alert('Por favor ingresa valores válidos para peso y altura');
+                return;
+            }
+
+            // Calcular IMC (convertir libras a kg)
+            const heightM = height / 100;
+            const weightKg = weight * 0.453592; // Convertir libras a kg
+            const bmi = weightKg / (heightM * heightM);
+            const roundedBMI = Math.round(bmi * 10) / 10;
+
+            // Calcular percentil
+            const percentile = calculateBMIPercentile(bmi, age, gender);
+
+            // Categoría
+            let category = '';
+            let description = '';
+
+            if (percentile < 5) {
+                category = 'Bajo Peso';
+                description = 'El niño tiene bajo peso. Consulta con un pediatra para evaluación.';
+            } else if (percentile < 85) {
+                category = 'Peso Normal';
+                description = 'El niño tiene un peso saludable para su edad y género.';
+            } else if (percentile < 95) {
+                category = 'Sobrepeso';
+                description = 'El niño tiene sobrepeso. Consulta con un pediatra para orientación.';
+            } else {
+                category = 'Obesidad';
+                description = 'El niño tiene obesidad. Consulta urgentemente con un pediatra.';
+            }
+
+            // Mostrar resultado en modal
+            const modalValue = document.getElementById('pediatric-modal-bmi-value');
+            const modalCategory = document.getElementById('pediatric-modal-bmi-category');
+            const modalDescription = document.getElementById('pediatric-modal-bmi-description');
+            const modalPercentile = document.getElementById('pediatric-modal-bmi-percentile');
+            
+            if (modalValue) modalValue.textContent = roundedBMI;
+            if (modalCategory) modalCategory.textContent = category;
+            if (modalDescription) modalDescription.textContent = description;
+            if (modalPercentile) modalPercentile.textContent = `Percentil: ${percentile.toFixed(1)}%`;
+            
+            console.log('Elementos del modal:', {modalValue, modalCategory, modalDescription, modalPercentile});
+
+            // Abrir modal
+            console.log('Abriendo modal pediátrico...');
+            openPediatricBMIModal();
+            
+            // Pequeño delay para asegurar que el modal se abra
+            setTimeout(() => {
+                const modalValue = document.getElementById('pediatric-modal-bmi-value');
+                const modalCategory = document.getElementById('pediatric-modal-bmi-category');
+                const modalDescription = document.getElementById('pediatric-modal-bmi-description');
+                const modalPercentile = document.getElementById('pediatric-modal-bmi-percentile');
+                
+                if (modalValue) modalValue.textContent = roundedBMI;
+                if (modalCategory) modalCategory.textContent = category;
+                if (modalDescription) modalDescription.textContent = description;
+                if (modalPercentile) modalPercentile.textContent = `Percentil: ${percentile.toFixed(1)}%`;
+            }, 100);
+        }
+
+        // Función de prueba
+        function testBMI() {
+            // Valores de prueba para adulto
+            document.getElementById('age').value = '30';
+            document.getElementById('weight').value = '70';
+            document.getElementById('height-ft').value = '170';
+            
+            // Calcular
+            calculateBMI();
+        }
+
+        // Cerrar modal al hacer clic fuera
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('bmi-modal');
+            if (e.target === modal) {
+                closeBMIModal();
+            }
+        });
+
+        // Cerrar modal con tecla Escape
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeBMIModal();
+            }
+        });
+
+        // Inicializar
+        document.addEventListener('DOMContentLoaded', function() {
+            // No calcular automáticamente al cargar
+            console.log('Calculadora de IMC cargada correctamente');
+            
+            // Inicializar colores según género por defecto (masculino)
+            updateCalculatorColors('male');
+            updatePediatricColors('male');
+            
+            // Agregar animaciones de clic a todos los elementos de navegación
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(item => {
+                // Evento de clic para escritorio - sin preventDefault para no interferir con onclick
+                item.addEventListener('click', function(e) {
+                    addClickAnimation(this);
+                }, { passive: true });
+                
+                // Eventos táctiles para móviles - sin preventDefault
+                item.addEventListener('touchstart', function(e) {
+                    addTouchAnimation(this);
+                }, { passive: true });
+                
+                item.addEventListener('touchend', function(e) {
+                    addClickAnimation(this);
+                }, { passive: true });
+            });
+            
+        });
+    </script>
+</body>
+</html>
