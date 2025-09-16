@@ -1445,6 +1445,88 @@
 
     <script>
         let currentGender = 'male';
+        // Datos OMS LMS incrustados (muestras clave por meses)
+        const lmsData = {
+            male: {
+                24: { L: -0.3521, M: 16.5756, S: 0.08005 },
+                36: { L: -0.3521, M: 16.0188, S: 0.08004 },
+                48: { L: -0.3521, M: 15.761, S: 0.08046 },
+                60: { L: -0.3521, M: 15.771, S: 0.08106 },
+                72: { L: -0.3521, M: 16.021, S: 0.082 },
+                84: { L: -0.3521, M: 16.437, S: 0.0829 },
+                96: { L: -0.3521, M: 16.951, S: 0.0837 },
+                108: { L: -0.3521, M: 17.513, S: 0.0843 },
+                120: { L: -0.3521, M: 18.033, S: 0.0847 },
+                144: { L: -0.3521, M: 19.055, S: 0.0844 },
+                168: { L: -0.3521, M: 20.214, S: 0.0832 },
+                192: { L: -0.3521, M: 21.093, S: 0.0811 },
+                216: { L: -0.3521, M: 21.505, S: 0.0792 },
+                228: { L: -0.3521, M: 21.6, S: 0.0785 }
+            },
+            female: {
+                24: { L: -0.3833, M: 16.3521, S: 0.08528 },
+                36: { L: -0.3833, M: 15.865, S: 0.0851 },
+                48: { L: -0.3833, M: 15.686, S: 0.0853 },
+                60: { L: -0.3833, M: 15.733, S: 0.0858 },
+                72: { L: -0.3833, M: 16.008, S: 0.0867 },
+                84: { L: -0.3833, M: 16.45, S: 0.0877 },
+                96: { L: -0.3833, M: 16.987, S: 0.0885 },
+                108: { L: -0.3833, M: 17.567, S: 0.089 },
+                120: { L: -0.3833, M: 18.046, S: 0.0891 },
+                144: { L: -0.3833, M: 18.98, S: 0.0881 },
+                168: { L: -0.3833, M: 19.93, S: 0.0862 },
+                192: { L: -0.3833, M: 20.52, S: 0.0842 },
+                216: { L: -0.3833, M: 20.72, S: 0.0832 },
+                228: { L: -0.3833, M: 20.75, S: 0.0829 }
+            }
+        };
+
+        function getLMSInterpolated(sex, ageMonths) {
+            if (!lmsData || !lmsData[sex]) return null;
+            const table = lmsData[sex];
+            const keys = Object.keys(table).map(k => parseInt(k, 10)).sort((a, b) => a - b);
+            if (keys.length === 0) return null;
+
+            if (ageMonths <= keys[0]) return table[String(keys[0])];
+            if (ageMonths >= keys[keys.length - 1]) return table[String(keys[keys.length - 1])];
+
+            let lower = keys[0];
+            let upper = keys[keys.length - 1];
+            for (let i = 0; i < keys.length - 1; i++) {
+                if (ageMonths >= keys[i] && ageMonths <= keys[i + 1]) {
+                    lower = keys[i];
+                    upper = keys[i + 1];
+                    break;
+                }
+            }
+
+            const t = (ageMonths - lower) / (upper - lower);
+            const L = table[String(lower)].L + t * (table[String(upper)].L - table[String(lower)].L);
+            const M = table[String(lower)].M + t * (table[String(upper)].M - table[String(lower)].M);
+            const S = table[String(lower)].S + t * (table[String(upper)].S - table[String(lower)].S);
+            return { L, M, S };
+        }
+
+        function bmiToZ(bmi, L, M, S) {
+            if (Math.abs(L) < 1e-9) {
+                return Math.log(bmi / M) / S;
+            }
+            return (Math.pow(bmi / M, L) - 1) / (L * S);
+        }
+
+        function erf(x) {
+            const sign = x < 0 ? -1 : 1;
+            x = Math.abs(x);
+            const a1 = 0.254829592, a2 = -0.284496736, a3 = 1.421413741, a4 = -1.453152027, a5 = 1.061405429, p = 0.3275911;
+            const t = 1 / (1 + p * x);
+            const y = 1 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * Math.exp(-x * x);
+            return sign * y;
+        }
+
+        function zToPercentile(z) {
+            const cdf = 0.5 * (1 + erf(z / Math.SQRT2));
+            return Math.min(Math.max(cdf * 100, 0), 100);
+        }
 
         function showScreen(screenId) {
             console.log('Mostrando pantalla:', screenId);
@@ -1642,6 +1724,15 @@
             }
 
             needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
+        }
+
+        // Percentil OMS (LMS) para IMC-edad
+        function calculateBMIPercentileLMS(bmi, ageMonths, gender) {
+            const sex = gender === 'male' ? 'male' : 'female';
+            const lms = getLMSInterpolated(sex, ageMonths);
+            if (!lms) return null;
+            const z = bmiToZ(bmi, lms.L, lms.M, lms.S);
+            return zToPercentile(z);
         }
 
         // Función para calcular percentiles de IMC pediátrico
@@ -1880,7 +1971,7 @@
 
 
         // Función para calcular IMC pediátrico
-        function calculatePediatricBMI() {
+        async function calculatePediatricBMI() {
             console.log('Calculando IMC pediátrico...');
             const age = parseInt(document.getElementById('pediatric-age').value) || 0;
             const weight = parseFloat(document.getElementById('pediatric-weight').value) || 0;
@@ -1906,8 +1997,13 @@
             const bmi = weightKg / (heightM * heightM);
             const roundedBMI = Math.round(bmi * 10) / 10;
 
-            // Calcular percentil
-            const percentile = calculateBMIPercentile(bmi, age, gender);
+            // Calcular percentil OMS con edad en meses
+            const ageMonths = Math.round(age * 12);
+            const percentile = calculateBMIPercentileLMS(bmi, ageMonths, gender);
+            if (percentile === null) {
+                alert('No hay datos OMS disponibles para esa edad.');
+                return;
+            }
 
             // Categoría
             let category = '';
