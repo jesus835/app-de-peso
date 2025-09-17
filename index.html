@@ -13,7 +13,7 @@
 
         body {
             font-family: 'TT Lakes Neue', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #1a1a1a;
+            background: #f5f5f0;
             color: #333;
             overflow-x: hidden;
             min-height: 100vh;
@@ -33,7 +33,7 @@
         .screen {
             width: 100%;
             height: 100%;
-            background: #1a1a1a;
+            background: #f5f5f0;
             border-radius: 32px;
             overflow: hidden;
             position: relative;
@@ -66,7 +66,7 @@
         .app-title {
             font-size: 24px;
             font-weight: bold;
-            color: #ffffff;
+            color: #000000;
         }
 
         .menu-btn {
@@ -76,7 +76,7 @@
             border: none;
             cursor: pointer;
             font-size: 18px;
-            color: #ffffff;
+            color: #000000;
         }
 
         /* Logo global fijo arriba de todo */
@@ -90,7 +90,7 @@
             max-width: 45vw;
             height: auto;
             pointer-events: none; /* no bloquear clics */
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+            filter: none;
         }
 
         .gender-selection {
@@ -107,8 +107,8 @@
             padding: 15px;
             border: 2px solid #6B7280;
             border-radius: 12px;
-            background: #374151;
-            color: #9CA3AF;
+            background: #f0f0f0;
+            color: #000000;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -120,20 +120,20 @@
         .gender-btn.active {
             border-color: #34C759;
             background: #34C759;
-            color: white;
+            color: #000000;
         }
 
         /* Colores dinámicos para género masculino (celeste) */
         .gender-male .gender-btn.active {
             border-color: #4A90E2;
             background: #4A90E2;
-            color: white;
+            color: #000000;
         }
 
         .gender-male .arrow-btn {
             border-color: #4A90E2;
             background: #4A90E2;
-            color: white;
+            color: #000000;
         }
 
         .gender-male .arrow-btn:hover {
@@ -161,13 +161,13 @@
         .gender-female .gender-btn.active {
             border-color: #E91E63;
             background: #E91E63;
-            color: white;
+            color: #000000;
         }
 
         .gender-female .arrow-btn {
             border-color: #E91E63;
             background: #E91E63;
-            color: white;
+            color: #000000;
         }
 
         .gender-female .arrow-btn:hover {
@@ -207,7 +207,7 @@
         .input-label {
             font-size: 16px;
             font-weight: 600;
-            color: #ffffff;
+            color: #000000;
             margin-bottom: 10px;
             display: block;
         }
@@ -225,8 +225,8 @@
             border-radius: 12px;
             font-size: 16px;
             text-align: center;
-            background: #2d2d2d;
-            color: #ffffff;
+            background: #ffffff;
+            color: #000000;
         }
 
         .input-field:focus {
@@ -290,13 +290,13 @@
 
         .unit-btn.active {
             background: #34C759;
-            color: white;
+            color: #000000;
             border-color: #34C759;
         }
 
         .calculate-btn {
             background: #34C759;
-            color: white;
+            color: #000000;
             border: none;
             padding: 18px;
             border-radius: 12px;
@@ -537,7 +537,7 @@
 
         .modal-btn-primary {
             background: #34C759;
-            color: white;
+            color: #000000;
         }
 
         .modal-btn-primary:hover {
@@ -562,7 +562,11 @@
         }
 
         /* Fondo con imagen semitransparente en sección pediátrica */
-        #pediatric-screen::before {
+        /* Fondo para todas las pantallas */
+        #calculator-screen::before,
+        #meter-screen::before,
+        #pediatric-screen::before,
+        #stats-screen::before {
             content: '';
             position: absolute;
             inset: 0;
@@ -575,7 +579,11 @@
             transform: scaleX(-1); /* espejo horizontal (mano a la derecha) */
             transform-origin: center;
         }
-        #pediatric-screen .bmi-content {
+        
+        #calculator-screen .bmi-content,
+        #meter-screen .bmi-meter-content,
+        #pediatric-screen .bmi-content,
+        #stats-screen .stats-content {
             position: relative;
             z-index: 1;
         }
@@ -646,8 +654,8 @@
             padding: 15px;
             border: 2px solid #6B7280;
             border-radius: 12px;
-            background: #374151;
-            color: #9CA3AF;
+            background: #f0f0f0;
+            color: #000000;
             cursor: pointer;
             display: flex;
             flex-direction: column;
@@ -659,20 +667,20 @@
         .pediatric-gender-btn.active {
             border-color: #34C759;
             background: #34C759;
-            color: white;
+            color: #000000;
         }
 
         /* Colores dinámicos para pediátrico masculino (celeste) */
         .pediatric-gender-male .pediatric-gender-btn.active {
             border-color: #4A90E2;
             background: #4A90E2;
-            color: white;
+            color: #000000;
         }
 
         .pediatric-gender-male .arrow-btn {
             border-color: #4A90E2;
             background: #4A90E2;
-            color: white;
+            color: #000000;
         }
 
         .pediatric-gender-male .arrow-btn:hover {
@@ -695,13 +703,13 @@
         .pediatric-gender-female .pediatric-gender-btn.active {
             border-color: #E91E63;
             background: #E91E63;
-            color: white;
+            color: #000000;
         }
 
         .pediatric-gender-female .arrow-btn {
             border-color: #E91E63;
             background: #E91E63;
-            color: white;
+            color: #000000;
         }
 
         .pediatric-gender-female .arrow-btn:hover {
@@ -768,7 +776,7 @@
         .pediatric-calculate-btn {
             width: 100%;
             background: #34C759;
-            color: white;
+            color: #000000;
             border: none;
             padding: 15px;
             border-radius: 8px;
@@ -1046,11 +1054,11 @@
         .gender-male .stat-card {
             background: #4A90E2;
             border-color: #4A90E2;
-            color: white;
+            color: #000000;
         }
 
         .gender-male .stat-value {
-            color: white;
+            color: #000000;
         }
 
         .gender-male .stat-label {
@@ -1061,11 +1069,11 @@
         .gender-female .stat-card {
             background: #E91E63;
             border-color: #E91E63;
-            color: white;
+            color: #000000;
         }
 
         .gender-female .stat-value {
-            color: white;
+            color: #000000;
         }
 
         .gender-female .stat-label {
@@ -1098,7 +1106,7 @@
         }
 
         .gender-male .chart-title {
-            color: white;
+            color: #000000;
         }
 
         .gender-male .chart-fill {
@@ -1116,7 +1124,7 @@
         }
 
         .gender-female .chart-title {
-            color: white;
+            color: #000000;
         }
 
         .gender-female .chart-fill {
@@ -1126,6 +1134,32 @@
         .gender-female .chart-label {
             color: rgba(255, 255, 255, 0.8);
         }
+
+        /* Colores dinámicos de estadísticas para pediátrico (aplicados en #stats-screen) */
+        /* Solo aplicar cuando NO esté en modo adulto */
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .stat-card {
+            background: #4A90E2;
+            border-color: #4A90E2;
+            color: #000000;
+        }
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .stat-value { color: #000000; }
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .stat-label { color: rgba(255, 255, 255, 0.8); }
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .chart-container { background: #4A90E2; border-color: #4A90E2; }
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .chart-title { color: #000000; }
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .chart-fill { background: white; }
+        #stats-screen.pediatric-gender-male:not(.gender-male):not(.gender-female) .chart-label { color: rgba(255, 255, 255, 0.8); }
+
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .stat-card {
+            background: #E91E63;
+            border-color: #E91E63;
+            color: #000000;
+        }
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .stat-value { color: #000000; }
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .stat-label { color: rgba(255, 255, 255, 0.8); }
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .chart-container { background: #E91E63; border-color: #E91E63; }
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .chart-title { color: #000000; }
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .chart-fill { background: white; }
+        #stats-screen.pediatric-gender-female:not(.gender-male):not(.gender-female) .chart-label { color: rgba(255, 255, 255, 0.8); }
 
         .chart-title {
             font-size: 16px;
@@ -1198,6 +1232,7 @@
                     </div>
                     <button class="menu-btn">→</button>
                 </div>
+                
 
                 <div class="gender-selection">
                     <label class="input-label">Género</label>
@@ -1249,7 +1284,7 @@
                 <button class="calculate-btn" onclick="calculateBMI()">Calcular</button>
 
                 <div class="result-section" id="result-section">
-                    <div style="background: #FF6B6B; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
+                    <div style="background: #FF6B6B; color: #000000; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
                         📊 RESULTADO DEL BMI
                     </div>
                     <div class="bmi-value" id="bmi-value">0</div>
@@ -1278,6 +1313,7 @@
         <!-- Pantalla BMI Meter -->
         <div class="screen" id="meter-screen">
             <div class="bmi-meter-content">
+                
                 <div class="meter-container">
                     <div class="meter-circle">
                         <div class="meter-inner">
@@ -1316,6 +1352,7 @@
                     <h1 class="app-title">Control de Peso Pediátrico</h1>
                     <button class="menu-btn" onclick="showScreen('calculator-screen')">←</button>
                 </div>
+                
 
                 <div class="gender-selection">
                     <label class="input-label">Género</label>
@@ -1370,7 +1407,7 @@
                 <button class="calculate-btn" onclick="calculatePediatricBMI()">Calcular</button>
 
                 <div class="result-section" id="pediatric-result-section">
-                    <div style="background: #FF6B6B; color: white; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
+                    <div style="background: #FF6B6B; color: #000000; padding: 10px; border-radius: 8px; margin-bottom: 15px; font-weight: bold;">
                         📊 RESULTADO DEL BMI PEDIÁTRICO
                     </div>
                     <div class="bmi-value" id="pediatric-bmi-value">0</div>
@@ -1403,6 +1440,7 @@
                     <h1 class="app-title">Estadísticas</h1>
                     <button class="menu-btn">→</button>
                 </div>
+                
 
                 <div class="stats-grid">
                     <div class="stat-card">
@@ -1885,7 +1923,7 @@
             
             // Remover clases de género existentes
             calculatorScreen.classList.remove('gender-male', 'gender-female');
-            statsScreen.classList.remove('gender-male', 'gender-female');
+            statsScreen.classList.remove('gender-male', 'gender-female', 'pediatric-gender-male', 'pediatric-gender-female');
             bottomNavs.forEach(nav => nav.classList.remove('gender-male', 'gender-female'));
             
             // Agregar clase de género correspondiente
@@ -1924,18 +1962,22 @@
         // Función para actualizar colores según género de la pantalla pediátrica
         function updatePediatricScreenColors(gender) {
             const pediatricScreen = document.getElementById('pediatric-screen');
+            const statsScreen = document.getElementById('stats-screen');
             const bottomNavs = document.querySelectorAll('.bottom-nav');
             
             // Remover clases de género existentes
             pediatricScreen.classList.remove('pediatric-gender-male', 'pediatric-gender-female');
+            statsScreen.classList.remove('pediatric-gender-male', 'pediatric-gender-female');
             bottomNavs.forEach(nav => nav.classList.remove('pediatric-gender-male', 'pediatric-gender-female'));
             
             // Agregar clase de género correspondiente
             if (gender === 'male') {
                 pediatricScreen.classList.add('pediatric-gender-male');
+                statsScreen.classList.add('pediatric-gender-male');
                 bottomNavs.forEach(nav => nav.classList.add('pediatric-gender-male'));
             } else {
                 pediatricScreen.classList.add('pediatric-gender-female');
+                statsScreen.classList.add('pediatric-gender-female');
                 bottomNavs.forEach(nav => nav.classList.add('pediatric-gender-female'));
             }
             
