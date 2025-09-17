@@ -596,6 +596,13 @@
             border-color: #34C759;
         }
 
+        /* Contenedor para años y meses */
+        .pediatric-age-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
         .pediatric-gender-buttons {
             display: flex;
             gap: 10px;
@@ -1279,11 +1286,14 @@
 
                 <div class="input-section">
                     <label class="input-label">Edad</label>
-                    <div class="input-container">
-                        <input type="number" class="input-field" id="pediatric-age" value="8" min="2" max="17">
-                        <div class="input-arrows">
-                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', 1)">▲</button>
-                            <button class="arrow-btn" onclick="adjustPediatricValue('pediatric-age', -1)">▼</button>
+                    <div class="input-container pediatric-age-inputs">
+                        <div style="flex:1; display:flex; gap:10px; align-items:center;">
+                            <input type="number" class="input-field" id="pediatric-age-years" value="8" min="2" max="19" placeholder="Años">
+                            <span style="color:#9CA3AF; font-size:12px;">años</span>
+                        </div>
+                        <div style="flex:1; display:flex; gap:10px; align-items:center;">
+                            <input type="number" class="input-field" id="pediatric-age-months" value="0" min="0" max="11" placeholder="Meses">
+                            <span style="color:#9CA3AF; font-size:12px;">meses</span>
                         </div>
                     </div>
                 </div>
@@ -1595,8 +1605,10 @@
             let value = parseInt(field.value) || 0;
             value += change;
             
-            if (fieldId === 'pediatric-age') {
-                value = Math.max(2, Math.min(17, value));
+            if (fieldId === 'pediatric-age-years') {
+                value = Math.max(2, Math.min(19, value));
+            } else if (fieldId === 'pediatric-age-months') {
+                value = Math.max(0, Math.min(11, value));
             } else if (fieldId === 'pediatric-weight') {
                 value = Math.max(10, Math.min(220, value));
             } else if (fieldId === 'pediatric-height') {
@@ -1973,16 +1985,21 @@
         // Función para calcular IMC pediátrico
         async function calculatePediatricBMI() {
             console.log('Calculando IMC pediátrico...');
-            const age = parseInt(document.getElementById('pediatric-age').value) || 0;
+            const years = parseInt(document.getElementById('pediatric-age-years').value) || 0;
+            const monthsExtra = parseInt(document.getElementById('pediatric-age-months').value) || 0;
             const weight = parseFloat(document.getElementById('pediatric-weight').value) || 0;
             const height = parseFloat(document.getElementById('pediatric-height').value) || 0;
             const gender = document.querySelector('#pediatric-screen .pediatric-gender-btn.active').dataset.gender;
             
-            console.log('Datos pediátricos:', {age, weight, height, gender});
+            console.log('Datos pediátricos:', {years, monthsExtra, weight, height, gender});
 
             // Validar datos
-            if (age < 2 || age > 17) {
-                alert('La edad debe estar entre 2 y 17 años');
+            if (years < 2 || years > 19) {
+                alert('La edad debe estar entre 2 y 19 años');
+                return;
+            }
+            if (monthsExtra < 0 || monthsExtra > 11) {
+                alert('Los meses deben estar entre 0 y 11');
                 return;
             }
 
@@ -1997,30 +2014,54 @@
             const bmi = weightKg / (heightM * heightM);
             const roundedBMI = Math.round(bmi * 10) / 10;
 
-            // Calcular percentil OMS con edad en meses
-            const ageMonths = Math.round(age * 12);
-            const percentile = calculateBMIPercentileLMS(bmi, ageMonths, gender);
-            if (percentile === null) {
+            // Calcular Z-score y percentil OMS con edad en meses (2–19 años)
+            const ageMonths = Math.round(years * 12 + monthsExtra);
+            if (ageMonths < 24 || ageMonths > 228) {
+                alert('La edad debe estar entre 24 y 228 meses (2–19 años).');
+                return;
+            }
+            const sexKey = gender === 'male' ? 'male' : 'female';
+            const lms = getLMSInterpolated(sexKey, ageMonths);
+            if (!lms) {
                 alert('No hay datos OMS disponibles para esa edad.');
                 return;
             }
+            const z = bmiToZ(bmi, lms.L, lms.M, lms.S);
+            const percentile = zToPercentile(z);
 
-            // Categoría
+            // Categoría separada por rango de edad
             let category = '';
             let description = '';
-
-            if (percentile < 5) {
-                category = 'Bajo Peso';
-                description = 'El niño tiene bajo peso. Consulta con un pediatra para evaluación.';
-            } else if (percentile < 85) {
-                category = 'Peso Normal';
-                description = 'El niño tiene un peso saludable para su edad y género.';
-            } else if (percentile < 95) {
-                category = 'Sobrepeso';
-                description = 'El niño tiene sobrepeso. Consulta con un pediatra para orientación.';
+            if (ageMonths <= 60) {
+                // 2–5 años: por Z-score
+                if (z < -2) {
+                    category = 'Bajo Peso';
+                    description = 'Por debajo de -2 Z. Requiere evaluación pediátrica.';
+                } else if (z < 1) {
+                    category = 'Peso Normal';
+                    description = 'Entre -2 Z y +1 Z. Rango saludable.';
+                } else if (z < 2) {
+                    category = 'Sobrepeso';
+                    description = 'Entre +1 Z y +2 Z. Sugiere intervención preventiva.';
+                } else {
+                    category = 'Obesidad';
+                    description = '≥ +2 Z. Requiere evaluación clínica.';
+                }
             } else {
-                category = 'Obesidad';
-                description = 'El niño tiene obesidad. Consulta urgentemente con un pediatra.';
+                // 5–19 años: por percentiles (3, 85, 97)
+                if (percentile < 3) {
+                    category = 'Bajo Peso';
+                    description = 'Por debajo del percentil 3. Requiere evaluación pediátrica.';
+                } else if (percentile < 85) {
+                    category = 'Peso Normal';
+                    description = 'Entre los percentiles 3 y 85. Rango saludable para 5–19 años.';
+                } else if (percentile < 97) {
+                    category = 'Sobrepeso';
+                    description = 'Entre los percentiles 85 y 97. Sugiere intervención preventiva.';
+                } else {
+                    category = 'Obesidad';
+                    description = 'En o por encima del percentil 97. Requiere evaluación clínica.';
+                }
             }
 
             // Mostrar resultado en la sección de resultados de la pantalla pediátrica
