@@ -79,6 +79,20 @@
             color: #ffffff;
         }
 
+        /* Logo global fijo arriba de todo */
+        .global-logo {
+            position: fixed;
+            top: 8px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10000; /* por encima de overlays y navegación */
+            width: 160px;
+            max-width: 45vw;
+            height: auto;
+            pointer-events: none; /* no bloquear clics */
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.4));
+        }
+
         .gender-selection {
             margin-bottom: 30px;
         }
@@ -547,6 +561,25 @@
             text-align: center;
         }
 
+        /* Fondo con imagen semitransparente en sección pediátrica */
+        #pediatric-screen::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: url('images/fondo.png');
+            background-size: 120% auto; /* más grande pero sin cortarse */
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.06; /* 6% */
+            pointer-events: none;
+            transform: scaleX(-1); /* espejo horizontal (mano a la derecha) */
+            transform-origin: center;
+        }
+        #pediatric-screen .bmi-content {
+            position: relative;
+            z-index: 1;
+        }
+
 
 
         .pediatric-header {
@@ -894,6 +927,15 @@
             animation: bounceClick 0.4s ease;
         }
 
+        /* Conservar color original SOLO del icono pediátrico */
+        .nav-item img[src$="bebe.png"] {
+            filter: none !important;
+        }
+        .nav-item:active img[src$="bebe.png"],
+        .nav-item.touching img[src$="bebe.png"] {
+            filter: none !important;
+        }
+
         /* Mejoras específicas para dispositivos táctiles */
         @media (hover: none) and (pointer: coarse) {
             .nav-item {
@@ -934,10 +976,10 @@
             height: 100%;
             border-radius: 50%;
             background: conic-gradient(
-                #34C759 0deg 90deg,
-                #FFD700 90deg 180deg,
-                #FF8C00 180deg 270deg,
-                #FF4500 270deg 360deg
+                #FFD700 0deg 90deg,    /* Bajo peso - amarillo */
+                #34C759 90deg 180deg,  /* Peso normal - verde */
+                #FF8C00 180deg 270deg, /* Sobrepeso - naranja */
+                #FF4500 270deg 360deg  /* Obesidad - rojo */
             );
             position: relative;
         }
@@ -1143,12 +1185,17 @@
     </style>
 </head>
 <body>
+    <!-- Logo global fijo -->
+    <img class="global-logo" src="images/crecikids.png" alt="CreciKids" />
+
     <div class="phone-container">
         <!-- Pantalla Principal - BMI Calculator -->
         <div class="screen active" id="calculator-screen">
             <div class="bmi-content">
                 <div class="header">
-                    <h1 class="app-title">Control de Peso</h1>
+                    <div style="flex:1; text-align:center;">
+                        <h1 class="app-title">Control de Peso</h1>
+                    </div>
                     <button class="menu-btn">→</button>
                 </div>
 
@@ -1422,6 +1469,18 @@
         </div>
     </div>
 
+    <!-- Modal Overlay para advertencia de edad pediátrica -->
+    <div class="modal-overlay" id="age-warning-modal">
+        <div class="modal-content">
+            <div class="modal-title">Edad pediátrica</div>
+            <div class="modal-bmi-description">Para personas menores de 20 años usa la sección pediátrica.</div>
+            <div class="modal-actions">
+                <button class="modal-btn modal-btn-primary" onclick="goToPediatricFromWarning()">Ir a Pediatría</button>
+                <button class="modal-btn modal-btn-secondary" onclick="closeAgeWarningModal()">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Modal Overlay para Resultado IMC -->
     <div class="modal-overlay" id="bmi-modal">
         <div class="modal-content">
@@ -1630,6 +1689,13 @@
                 return;
             }
 
+            // Redirigir a pediatría si edad es 0–19 años
+            if (age > 0 && age < 20) {
+                const modal = document.getElementById('age-warning-modal');
+                if (modal) modal.classList.add('show');
+                return;
+            }
+
             // Calcular altura en metros (siempre desde cm)
             const heightCm = parseFloat(document.getElementById('height-ft').value) || 0;
             height = heightCm / 100; // cm to meters
@@ -1671,7 +1737,7 @@
             if (bmi < 18.5) {
                 category = 'Bajo Peso';
                 description = 'Tienes bajo peso. Considera ganar peso de forma saludable.';
-                color = '#FFD700';
+                color = '#FFD700'; // Amarillo
                 range = 'Rango: < 18.5';
             } else if (bmi < 25) {
                 category = 'Peso Normal';
@@ -1681,7 +1747,7 @@
             } else if (bmi < 30) {
                 category = 'Sobrepeso';
                 description = 'Tienes sobrepeso. Considera perder peso de forma saludable.';
-                color = '#FF8C00';
+                color = '#FF8C00'; // Naranja
                 range = 'Rango: 25.0 - 29.9';
             } else {
                 category = 'Obesidad';
@@ -1726,13 +1792,17 @@
             let angle = 0;
 
             if (bmi < 18.5) {
-                angle = (bmi / 18.5) * 90; // 0-90 degrees
+                // Bajo peso: 0-90° (amarillo)
+                angle = (bmi / 18.5) * 90;
             } else if (bmi < 25) {
-                angle = 90 + ((bmi - 18.5) / 6.5) * 90; // 90-180 degrees
+                // Peso normal: 90-180° (verde)
+                angle = 90 + ((bmi - 18.5) / 6.5) * 90;
             } else if (bmi < 30) {
-                angle = 180 + ((bmi - 25) / 5) * 90; // 180-270 degrees
+                // Sobrepeso: 180-270° (naranja)
+                angle = 180 + ((bmi - 25) / 5) * 90;
             } else {
-                angle = 270 + Math.min(((bmi - 30) / 10) * 90, 90); // 270-360 degrees
+                // Obesidad: 270-360° (rojo) - más hacia el final
+                angle = 270 + Math.min(((bmi - 30) / 10) * 90, 90);
             }
 
             needle.style.transform = `translateX(-50%) rotate(${angle}deg)`;
@@ -1959,6 +2029,17 @@
             } else {
                 console.log('Modal pediátrico no encontrado');
             }
+        }
+
+        // Modal de advertencia edad pediátrica
+        function closeAgeWarningModal() {
+            const modal = document.getElementById('age-warning-modal');
+            if (modal) modal.classList.remove('show');
+        }
+
+        function goToPediatricFromWarning() {
+            closeAgeWarningModal();
+            showScreen('pediatric-screen');
         }
 
         // Función para cerrar modal pediátrico
