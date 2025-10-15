@@ -1825,7 +1825,132 @@
     </div>
 
     <script>
+        // Variables globales para almacenar datos
         let currentGender = 'male';
+        let currentPediatricGender = 'male';
+        let bmiHistory = [];
+
+        // Cache de recursos con localStorage
+        const CACHE_VERSION = '1.0.0';
+        const CACHE_KEY = 'crecikids_cache_v' + CACHE_VERSION;
+        
+        // Lista de recursos a cachear
+        const RESOURCES_TO_CACHE = [
+            'images/crecikids.png',
+            'images/bebe.png',
+            'images/bebe2.png',
+            'images/bebeblanci.png',
+            'images/duda.png',
+            'images/f.png',
+            'images/fondo.png',
+            'images/fondo2.png',
+            'images/google-play-store-new.png',
+            'images/grafico.png',
+            'images/hombre.png',
+            'images/hombre2.png',
+            'images/logoplay.png',
+            'images/lupa.png',
+            'images/productividad.png',
+            'images/s.png',
+            'images/ssd.png',
+            'images/carga.png',
+            'fonts/Quebec Serial ExtraBold.otf'
+        ];
+
+        // Función para cachear un recurso
+        async function cacheResource(url) {
+            try {
+                const response = await fetch(url);
+                if (response.ok) {
+                    const blob = await response.blob();
+                    const reader = new FileReader();
+                    reader.onload = function() {
+                        const base64 = reader.result.split(',')[1];
+                        localStorage.setItem('cache_' + url, base64);
+                        localStorage.setItem('cache_type_' + url, blob.type);
+                        console.log('Cached:', url);
+                    };
+                    reader.readAsDataURL(blob);
+                }
+            } catch (error) {
+                console.log('Error caching:', url, error);
+            }
+        }
+
+        // Función para obtener recurso del cache
+        function getCachedResource(url) {
+            const cached = localStorage.getItem('cache_' + url);
+            const type = localStorage.getItem('cache_type_' + url);
+            if (cached && type) {
+                return `data:${type};base64,${cached}`;
+            }
+            return url; // Fallback a URL original
+        }
+
+        // Función para precargar todos los recursos
+        async function preloadResources() {
+            const cacheData = localStorage.getItem(CACHE_KEY);
+            if (!cacheData) {
+                console.log('Iniciando precarga de recursos...');
+                
+                // Cachear cada recurso
+                for (const resource of RESOURCES_TO_CACHE) {
+                    await cacheResource(resource);
+                    // Pequeña pausa para no sobrecargar
+                    await new Promise(resolve => setTimeout(resolve, 100));
+                }
+                
+                // Marcar como cacheado
+                localStorage.setItem(CACHE_KEY, 'cached');
+                console.log('Todos los recursos han sido cacheados');
+            } else {
+                console.log('Recursos ya cacheados, usando cache');
+            }
+        }
+
+        // Función para reemplazar URLs con versiones cacheadas
+        function replaceWithCachedResources() {
+            // Reemplazar imágenes
+            document.querySelectorAll('img').forEach(img => {
+                const src = img.src;
+                if (RESOURCES_TO_CACHE.includes(src)) {
+                    img.src = getCachedResource(src);
+                }
+            });
+
+            // Reemplazar fuentes
+            const fontUrl = 'fonts/Quebec Serial ExtraBold.otf';
+            const cachedFont = getCachedResource(fontUrl);
+            if (cachedFont !== fontUrl) {
+                const style = document.createElement('style');
+                style.textContent = `
+                    @font-face {
+                        font-family: 'Quebec Serial ExtraBold';
+                        src: url('${cachedFont}') format('opentype');
+                        font-weight: normal;
+                        font-style: normal;
+                    }
+                `;
+                document.head.appendChild(style);
+            }
+        }
+
+        // Función para limpiar cache (útil para desarrollo)
+        function clearCache() {
+            const keys = Object.keys(localStorage);
+            keys.forEach(key => {
+                if (key.startsWith('cache_') || key === CACHE_KEY) {
+                    localStorage.removeItem(key);
+                }
+            });
+            console.log('Cache limpiado');
+        }
+
+        // Inicializar cache al cargar la página
+        document.addEventListener('DOMContentLoaded', async function() {
+            await preloadResources();
+            replaceWithCachedResources();
+        });
         // Datos OMS LMS incrustados (muestras clave por meses)
         const lmsData = {
             male: {
