@@ -3277,6 +3277,11 @@ const GOOGLE_APPS_SCRIPT_URL_CLICKS = 'https://script.google.com/macros/s/AKfycb
                
                // Set user as logged in
                setLoggedIn(email, username);
+
+               // Registrar entrada inmediatamente tras login
+               if (typeof captureUserEntry === 'function') {
+                   try { captureUserEntry(); } catch (e) { console.warn('captureUserEntry error:', e); }
+               }
                
                // Hide login screen
                hideLoginScreen();
