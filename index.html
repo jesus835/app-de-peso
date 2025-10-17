@@ -2931,15 +2931,22 @@
 
         // Inicializar
         document.addEventListener('DOMContentLoaded', function() {
-            // Cambiar a la pantalla de calculadora después de 4 segundos
+            // Cambiar a la pantalla correspondiente después de 4 segundos
             setTimeout(function() {
                 // Mostrar el phone-container
                 const phoneContainer = document.getElementById('phone-container');
                 if (phoneContainer) {
                     phoneContainer.style.display = 'block';
                 }
-                // Cambiar a la calculadora
-                showScreen('calculator-screen');
+                
+                // Verificar si está logueado ANTES de mostrar la calculadora
+                if (!isLoggedIn()) {
+                    console.log('🔐 Usuario no logueado, yendo directo a login');
+                    showScreen('login-screen');
+                } else {
+                    console.log('✅ Usuario logueado, mostrando calculadora');
+                    showScreen('calculator-screen');
+                }
             }, 4000);
             
             // No calcular automáticamente al cargar
@@ -3296,12 +3303,13 @@ const GOOGLE_APPS_SCRIPT_URL_CLICKS = 'https://script.google.com/macros/s/AKfycb
                 phoneContainer.style.display = 'block';
             }
             
-            // Hide loading screen and show calculator
-            showScreen('calculator-screen');
-
-            // Check login status
+            // Verificar login status y mostrar pantalla correspondiente
             if (!isLoggedIn()) {
-                showLoginScreen();
+                console.log('🔐 Usuario no logueado, yendo a login');
+                showScreen('login-screen');
+            } else {
+                console.log('✅ Usuario logueado, mostrando calculadora');
+                showScreen('calculator-screen');
             }
         }
 
