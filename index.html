@@ -2385,6 +2385,15 @@
             
             // Scroll hacia el resultado
             resultSection.scrollIntoView({ behavior: 'smooth' });
+            
+            // Resetear todos los inputs a 0 (adulto y pediátrico)
+            document.getElementById('age').value = '0';
+            document.getElementById('height-ft').value = '0';
+            document.getElementById('weight').value = '0';
+            document.getElementById('pediatric-age-years').value = '0';
+            document.getElementById('pediatric-age-months').value = '0';
+            document.getElementById('pediatric-height').value = '0';
+            document.getElementById('pediatric-weight').value = '0';
         }
 
         function updateMeter(bmi) {
@@ -2901,6 +2910,15 @@
                 if (modalDescription) modalDescription.textContent = description;
                 if (modalPercentile) modalPercentile.textContent = `Percentil: ${percentile.toFixed(1)}%`;
             }, 100);
+            
+            // Resetear todos los inputs a 0 (adulto y pediátrico)
+            document.getElementById('age').value = '0';
+            document.getElementById('height-ft').value = '0';
+            document.getElementById('weight').value = '0';
+            document.getElementById('pediatric-age-years').value = '0';
+            document.getElementById('pediatric-age-months').value = '0';
+            document.getElementById('pediatric-height').value = '0';
+            document.getElementById('pediatric-weight').value = '0';
         }
 
         // Función de prueba
