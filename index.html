@@ -3002,6 +3002,43 @@
                 }, { passive: true });
             });
             
+            // Agregar funcionalidad para borrar el "0" cuando se empieza a escribir
+            const inputFields = [
+                'age',
+                'height-ft',
+                'weight',
+                'pediatric-age-years',
+                'pediatric-age-months',
+                'pediatric-height',
+                'pediatric-weight'
+            ];
+            
+            inputFields.forEach(fieldId => {
+                const input = document.getElementById(fieldId);
+                if (input) {
+                    // Cuando el usuario hace foco en el campo
+                    input.addEventListener('focus', function() {
+                        if (this.value === '0') {
+                            this.value = '';
+                        }
+                    });
+                    
+                    // Si el usuario sale del campo sin escribir nada, vuelve a poner el 0
+                    input.addEventListener('blur', function() {
+                        if (this.value === '') {
+                            this.value = '0';
+                        }
+                    });
+                    
+                    // Alternativa: borrar el 0 cuando se empieza a escribir
+                    input.addEventListener('keydown', function(e) {
+                        if (this.value === '0' && e.key !== 'Tab' && e.key !== 'Shift' && e.key !== 'Enter') {
+                            this.value = '';
+                        }
+                    });
+                }
+            });
+            
         });
     </script>
 
